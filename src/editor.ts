@@ -67,7 +67,7 @@ function render(
   }
 
   out += "\n\n";
-  out += "  WASD/Arrows: move   Space/Enter: draw   C: clear cell   X: clear all\n";
+  out += "  Arrows: move   Space/Enter: draw   C: clear cell   X: clear all\n";
   out += "  1-9,0: pick color   S: save & quit   Q / Ctrl+C: quit\n";
   if (message) {
     out += `\n  \x1b[33m${message}\x1b[0m`;
@@ -153,10 +153,6 @@ export function runEditor(rows: number, cols: number): Promise<string | null> {
       let msg = "";
 
       switch (key) {
-        case "w": moveCursor("A"); break;
-        case "s": moveCursor("B"); break;
-        case "a": moveCursor("D"); break;
-        case "d": moveCursor("C"); break;
         case " ":
         case "\r":
           grid[cursorR][cursorC] = PALETTE[currentIdx].char;
