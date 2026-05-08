@@ -1,0 +1,24 @@
+{
+  "name": "amoji",
+  "version": "0.1.0",
+  "description": "Emoji/sticker manager for AI agents - collect, create, and search custom stickers",
+  "main": "dist/index.js",
+  "bin": {
+    "amoji": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0",
+    "tsx": "^4.19.0"
+  }
+}

@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.amoji/
+*.db
+*.db-wal
+*.db-shm
+.claude/settings.local.json
+package-lock.json
