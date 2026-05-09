@@ -1,15 +1,35 @@
 {
   "name": "amoji",
-  "version": "0.1.0",
-  "description": "Emoji/sticker manager for AI agents - collect, create, and search custom stickers",
+  "version": "0.2.0",
+  "description": "Emoji/sticker manager for AI agents — collect, create, and search custom stickers",
+  "license": "MIT",
+  "author": "MMMarcinho",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MMMarcinho/amoji.git"
+  },
+  "keywords": [
+    "emoji",
+    "sticker",
+    "ascii-art",
+    "cli",
+    "ai-agent"
+  ],
   "main": "dist/index.js",
   "bin": {
     "amoji": "./dist/index.js"
   },
+  "files": [
+    "dist/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "better-sqlite3": "^11.7.0",

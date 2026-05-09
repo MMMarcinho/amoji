@@ -4,6 +4,18 @@ Emoji/sticker manager for AI agents — collect, create, and search custom stick
 
 ## Installation
 
+### Prerequisites
+
+`better-sqlite3` is a native module and requires a C++ build toolchain:
+
+| Platform | Requirement |
+|---|---|
+| **Windows** | [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022) with "Desktop development with C++" workload, or `npm install --global windows-build-tools` |
+| **macOS** | Xcode Command Line Tools: `xcode-select --install` |
+| **Linux** | `build-essential` + `python3`: `sudo apt install build-essential python3` |
+
+### Setup
+
 ```bash
 npm install
 npm run build
@@ -95,10 +107,20 @@ For ASCII stickers this prints the art to stdout. For image stickers it prints t
 amoji info <name|id>
 ```
 
-**Mark as used manually:**
+**Mark as used and get structured output:**
 ```bash
-amoji use <name|id>
+amoji use <name|id>            # file path + metadata
+amoji use <name|id> --base64   # also returns base64 data URI (images only)
 ```
+
+Outputs structured `key:value` lines:
+
+- `file:<absolute-path>` — always present
+- `type:image|ascii` — always present
+- `name:<name>` — always present
+- `count:<n>` — usage count after marking
+- `base64:<data-uri>` — only with `--base64` on image stickers
+- `───` separator followed by raw ASCII art (ASCII only)
 
 ---
 
@@ -151,4 +173,5 @@ amoji delete 7
 
 - Names must be unique. If you add a sticker with a name that already exists, a timestamp is appended automatically.
 - FTS (full-text search) is used for `search`. If it returns nothing, a `LIKE` fallback runs automatically.
-- `show` increments the usage counter; `info` does not.
+- `show` and `use` both increment the usage counter; `info` does not.
+- `use --base64` encodes the image file on the fly and outputs a data URI — convenient for embedding in HTML/markdown without a separate file server.

@@ -24,6 +24,22 @@ amoji show <name|id>
 For ASCII stickers, `show` prints the art to stdout — output it inline.  
 For image stickers, `show` prints the absolute file path — embed it as `![name](path)`.
 
+### `use` — mark as used and get content
+
+```bash
+amoji use <name|id>           # returns file path + metadata
+amoji use <name|id> --base64  # also returns base64-encoded image data
+```
+
+Outputs structured `key:value` lines followed by content body (for ASCII):
+
+- `file:<absolute-path>` — always present
+- `type:image|ascii` — always present
+- `name:<name>` — always present
+- `count:<n>` — usage count after marking
+- `base64:<data-uri>` — only with `--base64` on image stickers
+- `───` separator, then raw ASCII art (ASCII stickers only)
+
 If nothing matches, try a different query or tell the user no sticker fits.
 
 ## Add a sticker
@@ -48,6 +64,8 @@ Always supply `-k` and `-d` so the sticker is searchable later.
 | Browse keywords | `amoji keywords` |
 | Recently used | `amoji recent` |
 | Most popular | `amoji popular` |
+| Show content | `amoji show <name\|id>` |
+| Use + structured output | `amoji use <name\|id> [--base64]` |
 | Metadata only | `amoji info <name\|id>` |
 | Append keywords | `amoji tag <name\|id> "kw1,kw2" --append` |
 | Set description | `amoji desc <name\|id> "text"` |
@@ -56,6 +74,6 @@ Always supply `-k` and `-d` so the sticker is searchable later.
 ## Notes
 
 - Names and numeric IDs are interchangeable in all commands.
-- `show` increments the usage counter; `info` does not.
+- `show` prints raw content (ASCII art or file path); `use` prints structured `key:value` lines + optional `--base64` data URI. Both increment the usage counter.
 - Search uses FTS with automatic LIKE fallback — partial matches and multi-word queries work.
 - Duplicate names get a timestamp suffix automatically.

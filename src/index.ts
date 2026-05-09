@@ -273,12 +273,48 @@ program
 
 program
   .command("use")
-  .description("Manually mark a sticker as used (fallback — 'show' already counts automatically)")
+  .description("Mark a sticker as used and return its content (file path, or base64 with --base64)")
   .argument("<name>", "Sticker name or ID")
-  .action((name: string) => {
-    if (!db.markUsed(name)) fail(`Sticker "${name}" not found`);
-    const s = db.getSticker(name)!;
-    console.log(`Marked "${s.name}" as used (count: ${s.usageCount}).`);
+  .option("--base64", "Also output base64-encoded content (image stickers only)")
+  .action((name: string, opts: { base64?: boolean }) => {
+    const s = db.getSticker(name);
+    if (!s) fail(`Sticker "${name}" not found`);
+    db.markUsed(name);
+
+    const filePath = path.join(AMOJI_DIR, s.path);
+
+    if (s.type === "ascii") {
+      if (!fs.existsSync(filePath)) fail(`File missing: ${filePath}`);
+      const art = fs.readFileSync(filePath, "utf-8");
+      console.log(`file:${filePath}`);
+      console.log(`type:ascii`);
+      console.log(`name:${s.name}`);
+      console.log(`count:${s.usageCount}`);
+      console.log(`───`);
+      process.stdout.write(art);
+    } else {
+      console.log(`file:${filePath}`);
+      console.log(`type:image`);
+      console.log(`name:${s.name}`);
+      console.log(`count:${s.usageCount}`);
+      if (opts.base64) {
+        if (!fs.existsSync(filePath)) fail(`File missing: ${filePath}`);
+        const buf = fs.readFileSync(filePath);
+        const b64 = buf.toString("base64");
+        const ext = path.extname(filePath).toLowerCase().replace(".", "");
+        const mimeMap: Record<string, string> = {
+          png: "image/png",
+          jpg: "image/jpeg",
+          jpeg: "image/jpeg",
+          gif: "image/gif",
+          webp: "image/webp",
+          svg: "image/svg+xml",
+          bmp: "image/bmp",
+        };
+        const mime = mimeMap[ext] || "application/octet-stream";
+        console.log(`base64:data:${mime};base64,${b64}`);
+      }
+    }
   });
 
 program
