@@ -276,8 +276,7 @@ program
   .description("Manually mark a sticker as used (fallback — 'show' already counts automatically)")
   .argument("<name>", "Sticker name or ID")
   .action((name: string) => {
-    if (!db.getSticker(name)) fail(`Sticker "${name}" not found`);
-    db.markUsed(name);
+    if (!db.markUsed(name)) fail(`Sticker "${name}" not found`);
     const s = db.getSticker(name)!;
     console.log(`Marked "${s.name}" as used (count: ${s.usageCount}).`);
   });
