@@ -4,6 +4,29 @@ Emoji/sticker manager for AI agents — collect, create, and search custom stick
 
 ## Installation
 
+### Global (recommended for CLI use)
+
+```bash
+npm install -g amoji
+```
+
+After installation, the `amoji` command is available everywhere:
+
+```bash
+amoji list
+amoji search "happy"
+```
+
+### Local (as a library)
+
+```bash
+npm install amoji
+```
+
+```js
+const { getStickers, searchStickers } = require("amoji");
+```
+
 ### Prerequisites
 
 Node.js >= 20 on a standard platform (Windows / macOS / Linux, x64 or arm64).  
@@ -17,12 +40,14 @@ If you are on an uncommon CPU architecture or running Node from source, the nati
 | **macOS** | Xcode Command Line Tools: `xcode-select --install` |
 | **Linux** | `build-essential` + `python3`: `sudo apt install build-essential python3` |
 
-### Setup
+### Development setup
 
 ```bash
+git clone https://github.com/MMMarcinho/amoji.git
+cd amoji
 npm install
 npm run build
-npm link          # makes `amoji` available globally
+npm link          # makes `amoji` available globally from source
 ```
 
 Or run directly without installing:
