@@ -6,11 +6,14 @@ Emoji/sticker manager for AI agents — collect, create, and search custom stick
 
 ### Prerequisites
 
-`better-sqlite3` is a native module and requires a C++ build toolchain:
+Node.js >= 20 on a standard platform (Windows / macOS / Linux, x64 or arm64).  
+`better-sqlite3` ships prebuilt binaries for all supported Node versions — no build toolchain needed in normal use.
 
-| Platform | Requirement |
+If you are on an uncommon CPU architecture or running Node from source, the native module may need to fall back to compilation:
+
+| Platform | Fallback requirement |
 |---|---|
-| **Windows** | [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022) with "Desktop development with C++" workload, or `npm install --global windows-build-tools` |
+| **Windows** | [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022) with "Desktop development with C++" workload |
 | **macOS** | Xcode Command Line Tools: `xcode-select --install` |
 | **Linux** | `build-essential` + `python3`: `sudo apt install build-essential python3` |
 
