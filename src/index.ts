@@ -4,6 +4,7 @@ import { exec } from "child_process";
 import { StickerDB, AMOJI_DIR } from "./db";
 import { startWebServer } from "./web";
 import { runEditor } from "./editor";
+import { imageToAscii } from "./image-ascii";
 import { Sticker } from "./types";
 import path from "path";
 import fs from "fs";
@@ -230,20 +231,26 @@ program
 
 program
   .command("show")
-  .description("Display sticker content (for piping / copy-paste); also marks as used")
+  .description("Display sticker content; also marks as used")
   .argument("<name>", "Sticker name or ID")
-  .action((name: string) => {
+  .option("--no-color", "Render image as monochrome ASCII")
+  .option("-w, --width <n>", "ASCII render width in columns", "80")
+  .action(async (name: string, opts: { color: boolean; width: string }) => {
     const sticker = db.getSticker(name);
     if (!sticker) fail(`Sticker "${name}" not found`);
     db.markUsed(name);
 
     const filePath = path.join(AMOJI_DIR, sticker.path);
+    if (!fs.existsSync(filePath)) fail(`File missing: ${filePath}`);
+
     if (sticker.type === "ascii") {
-      if (!fs.existsSync(filePath)) fail(`File missing: ${filePath}`);
       process.stdout.write(fs.readFileSync(filePath, "utf-8"));
     } else {
-      // For images: output the absolute path
-      console.log(filePath);
+      const art = await imageToAscii(filePath, {
+        width: parseInt(opts.width) || 80,
+        color: opts.color,
+      });
+      console.log(art);
     }
   });
 
@@ -268,9 +275,15 @@ program
     console.log(`File:         ${filePath}`);
     console.log(`Exists:       ${fs.existsSync(filePath) ? "yes" : "NO (file missing!)"}`);
 
-    if (sticker.type === "ascii" && fs.existsSync(filePath)) {
-      const art = fs.readFileSync(filePath, "utf-8");
-      console.log(`Preview:\n───\n${art}\n───`);
+    if (fs.existsSync(filePath)) {
+      if (sticker.type === "ascii") {
+        const art = fs.readFileSync(filePath, "utf-8");
+        console.log(`Preview:\n───\n${art}\n───`);
+      } else {
+        imageToAscii(filePath, { width: 60, color: true }).then((art) => {
+          console.log(`Preview:\n───\n${art}\n───`);
+        });
+      }
     }
   });
 
