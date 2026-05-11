@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Command } from "commander";
 import { exec } from "child_process";
 import { StickerDB, AMOJI_DIR } from "./db";
