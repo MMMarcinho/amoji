@@ -233,9 +233,10 @@ program
   .command("show")
   .description("Display sticker content; also marks as used")
   .argument("<name>", "Sticker name or ID")
-  .option("--no-color", "Render image as monochrome ASCII")
+  .option("--ascii", "Render image sticker as ASCII art")
+  .option("--no-color", "Render ASCII without color")
   .option("-w, --width <n>", "ASCII render width in columns", "80")
-  .action(async (name: string, opts: { color: boolean; width: string }) => {
+  .action(async (name: string, opts: { ascii?: boolean; color: boolean; width: string }) => {
     const sticker = db.getSticker(name);
     if (!sticker) fail(`Sticker "${name}" not found`);
     db.markUsed(name);
@@ -245,12 +246,14 @@ program
 
     if (sticker.type === "ascii") {
       process.stdout.write(fs.readFileSync(filePath, "utf-8"));
-    } else {
+    } else if (opts.ascii) {
       const art = await imageToAscii(filePath, {
         width: parseInt(opts.width) || 80,
         color: opts.color,
       });
-      console.log(art);
+      process.stdout.write(art);
+    } else {
+      console.log(filePath);
     }
   });
 
@@ -275,24 +278,21 @@ program
     console.log(`File:         ${filePath}`);
     console.log(`Exists:       ${fs.existsSync(filePath) ? "yes" : "NO (file missing!)"}`);
 
-    if (fs.existsSync(filePath)) {
-      if (sticker.type === "ascii") {
-        const art = fs.readFileSync(filePath, "utf-8");
-        console.log(`Preview:\n───\n${art}\n───`);
-      } else {
-        imageToAscii(filePath, { width: 60, color: true }).then((art) => {
-          console.log(`Preview:\n───\n${art}\n───`);
-        });
-      }
+    if (sticker.type === "ascii" && fs.existsSync(filePath)) {
+      const art = fs.readFileSync(filePath, "utf-8");
+      console.log(`Preview:\n───\n${art}\n───`);
     }
   });
 
 program
   .command("use")
-  .description("Mark a sticker as used and return its content (file path, or base64 with --base64)")
+  .description("Mark a sticker as used and return its content")
   .argument("<name>", "Sticker name or ID")
   .option("--base64", "Also output base64-encoded content (image stickers only)")
-  .action((name: string, opts: { base64?: boolean }) => {
+  .option("--ascii", "Output ASCII art render (image stickers only)")
+  .option("--no-color", "Render ASCII without color")
+  .option("-w, --width <n>", "ASCII render width in columns", "80")
+  .action(async (name: string, opts: { base64?: boolean; ascii?: boolean; color: boolean; width: string }) => {
     const s = db.getSticker(name);
     if (!s) fail(`Sticker "${name}" not found`);
     db.markUsed(name);
@@ -313,6 +313,15 @@ program
       console.log(`type:image`);
       console.log(`name:${s.name}`);
       console.log(`count:${s.usageCount}`);
+      if (opts.ascii) {
+        if (!fs.existsSync(filePath)) fail(`File missing: ${filePath}`);
+        const art = await imageToAscii(filePath, {
+          width: parseInt(opts.width) || 80,
+          color: opts.color,
+        });
+        console.log(`───`);
+        process.stdout.write(art);
+      }
       if (opts.base64) {
         if (!fs.existsSync(filePath)) fail(`File missing: ${filePath}`);
         const buf = fs.readFileSync(filePath);
