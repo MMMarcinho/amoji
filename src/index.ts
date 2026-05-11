@@ -1,5 +1,7 @@
 import { Command } from "commander";
+import { exec } from "child_process";
 import { StickerDB, AMOJI_DIR } from "./db";
+import { startWebServer } from "./web";
 import { runEditor } from "./editor";
 import { Sticker } from "./types";
 import path from "path";
@@ -391,11 +393,36 @@ program
     printTable(stickers);
   });
 
+program
+  .command("web")
+  .description("Start a web gallery to browse all stickers with filters")
+  .option("-p, --port <port>", "Port to listen on", "3000")
+  .action(async (opts: { port: string }) => {
+    keepDbOpen = true;
+    const preferredPort = parseInt(opts.port) || 3000;
+    const { port, server } = await startWebServer(db, preferredPort);
+    console.log(`Amoji web: http://localhost:${port}/`);
+
+    const openCmd =
+      process.platform === "darwin" ? "open" :
+      process.platform === "win32" ? "start" : "xdg-open";
+    exec(`${openCmd} http://localhost:${port}/`);
+
+    process.on("SIGINT", () => {
+      console.log("\nShutting down web server...");
+      server.close();
+      db.close();
+      process.exit(0);
+    });
+  });
+
 // ── run ──────────────────────────────────────────────────────────────
+
+let keepDbOpen = false;
 
 program.parseAsync().catch((err) => {
   console.error("Error:", err.message);
   process.exit(1);
 }).finally(() => {
-  db.close();
+  if (!keepDbOpen) db.close();
 });
