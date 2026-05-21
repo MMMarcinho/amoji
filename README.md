@@ -1,6 +1,10 @@
+![Amoji README header](assets/readme-header.png)
+
 # amoji
 
 Emoji/sticker manager for AI agents — collect, create, and search custom stickers stored locally.
+
+[中文文档](README.zh-CN.md)
 
 ## Installation
 
