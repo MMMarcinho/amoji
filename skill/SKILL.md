@@ -29,6 +29,7 @@ For image stickers, `show` prints the absolute file path — embed it as `![name
 ```bash
 amoji use <name|id>           # returns file path + metadata
 amoji use <name|id> --base64  # also returns base64-encoded image data
+amoji use <name|id> --ascii   # renders an image sticker as terminal-safe ASCII
 ```
 
 Outputs structured `key:value` lines followed by content body (for ASCII):
@@ -38,7 +39,7 @@ Outputs structured `key:value` lines followed by content body (for ASCII):
 - `name:<name>` — always present
 - `count:<n>` — usage count after marking
 - `base64:<data-uri>` — only with `--base64` on image stickers
-- `───` separator, then raw ASCII art (ASCII stickers only)
+- `───` separator, then raw ASCII art (ASCII stickers, or image stickers with `--ascii`)
 
 If nothing matches, try a different query or tell the user no sticker fits.
 
@@ -48,8 +49,8 @@ If nothing matches, try a different query or tell the user no sticker fits.
 # Image file
 amoji add <name> <path> -k "kw1,kw2" -d "what it expresses"
 
-# ASCII art from a text file
-amoji ascii <name> -f <path> -k "kw1,kw2" -d "what it expresses"
+# ASCII art generated from an image
+amoji ascii <name> <path> -k "kw1,kw2" -d "what it expresses" --width 80 --no-color
 ```
 
 Always supply `-k` and `-d` so the sticker is searchable later.

@@ -21,16 +21,6 @@ amoji list
 amoji search "happy"
 ```
 
-### 本地安装（作为库使用）
-
-```bash
-npm install amoji
-```
-
-```js
-const { getStickers, searchStickers } = require("amoji");
-```
-
 ### 环境要求
 
 Node.js >= 20，支持常见平台（Windows / macOS / Linux，x64 或 arm64）。  
@@ -76,21 +66,22 @@ amoji add <name> <file> [-k keywords] [-d description]
 amoji add thumbsup ~/Downloads/thumbsup.png -k "approve,yes,good" -d "strong approval"
 ```
 
-**交互式创建 ASCII art：**
+**从图片生成 ASCII art：**
 
 ```bash
-amoji ascii <name> [-k keywords] [-d description] [-r rows] [-c cols]
+amoji ascii <name> <file> [-k keywords] [-d description] [-w width] [-H height]
 
-amoji ascii shrug -k "whatever,meh" -d "indifferent shrug"
+amoji ascii thumbsup_ascii ~/Downloads/thumbsup.png -w 72 -k "approve,yes,good" -d "strong approval"
 ```
 
-使用方向键移动光标，Space/Enter 绘制，`1`–`9`/`0` 选择块字符，`C` 清空当前单元格，`X` 清空全部，`S` 保存，`Q` 不保存退出。
-
-**从文本文件导入 ASCII art：**
+ASCII 生成默认使用纯 7-bit 字符，尽量兼容自定义终端。也可以控制尺寸、字符集和颜色：
 
 ```bash
-amoji ascii shrug -f path/to/art.txt -k "whatever,meh"
+amoji ascii face ~/Downloads/face.png --charset dense --color-mode ansi256
+amoji ascii face_plain ~/Downloads/face.png --width 100 --height 32 --no-color
 ```
+
+颜色模式支持 `none`、`auto`、`ansi16`、`ansi256`、`truecolor`。字符集支持 `standard`、`dense`、`minimal`、`binary`；也可以用 `--chars` 自定义从最深到最浅的字符序列。
 
 ---
 
@@ -139,9 +130,10 @@ amoji popular [-n limit]    # 默认 10
 
 ```bash
 amoji show <name|id>
+amoji show <name|id> --ascii --width 80 --color-mode auto
 ```
 
-ASCII 贴纸会把内容打印到 stdout。图片贴纸会打印图片文件的绝对路径。
+ASCII 贴纸会把已保存的内容打印到 stdout。图片贴纸默认打印图片文件的绝对路径；使用 `--ascii` 时会即时渲染为 ASCII。
 
 **仅展示元数据**，不会增加使用次数：
 
@@ -154,6 +146,7 @@ amoji info <name|id>
 ```bash
 amoji use <name|id>            # 文件路径 + 元数据
 amoji use <name|id> --base64   # 同时返回 base64 data URI（仅图片）
+amoji use <name|id> --ascii --charset dense --color-mode ansi16
 ```
 
 输出为结构化的 `key:value` 行：
@@ -163,7 +156,7 @@ amoji use <name|id> --base64   # 同时返回 base64 data URI（仅图片）
 - `name:<name>` — 始终存在
 - `count:<n>` — 标记使用后的使用次数
 - `base64:<data-uri>` — 仅在图片贴纸使用 `--base64` 时出现
-- `───` 分隔线，后面跟原始 ASCII art（仅 ASCII）
+- `───` 分隔线，后面跟原始 ASCII art（ASCII 贴纸，或图片贴纸使用 `--ascii`）
 
 ---
 
@@ -221,3 +214,4 @@ amoji delete 7
 - `search` 使用 FTS（全文搜索）。如果没有结果，会自动回退到 `LIKE` 搜索。
 - `show` 和 `use` 都会增加使用次数；`info` 不会。
 - `use --base64` 会即时编码图片文件并输出 data URI，适合嵌入 HTML/Markdown，而不需要额外的文件服务。
+- `--color-mode auto` 只会在 stdout 看起来支持颜色时输出 ANSI；非 TTY 或设置了 `NO_COLOR` 时会回退为纯 ASCII。

@@ -21,16 +21,6 @@ amoji list
 amoji search "happy"
 ```
 
-### Local (as a library)
-
-```bash
-npm install amoji
-```
-
-```js
-const { getStickers, searchStickers } = require("amoji");
-```
-
 ### Prerequisites
 
 Node.js >= 20 on a standard platform (Windows / macOS / Linux, x64 or arm64).  
@@ -75,19 +65,21 @@ amoji add <name> <file> [-k keywords] [-d description]
 amoji add thumbsup ~/Downloads/thumbsup.png -k "approve,yes,good" -d "strong approval"
 ```
 
-**Create ASCII art interactively:**
+**Create ASCII art from an image:**
 ```bash
-amoji ascii <name> [-k keywords] [-d description] [-r rows] [-c cols]
+amoji ascii <name> <file> [-k keywords] [-d description] [-w width] [-H height]
 
-amoji ascii shrug -k "whatever,meh" -d "indifferent shrug"
+amoji ascii thumbsup_ascii ~/Downloads/thumbsup.png -w 72 -k "approve,yes,good" -d "strong approval"
 ```
 
-Use arrow keys to move the cursor, Space/Enter to draw, `1`–`9`/`0` to pick a block character, `C` to clear a cell, `X` to clear all, `S` to save, `Q` to quit without saving.
+ASCII generation defaults to plain 7-bit characters for maximum terminal compatibility. Optional rendering controls:
 
-**Import ASCII art from a text file:**
 ```bash
-amoji ascii shrug -f path/to/art.txt -k "whatever,meh"
+amoji ascii face ~/Downloads/face.png --charset dense --color-mode ansi256
+amoji ascii face_plain ~/Downloads/face.png --width 100 --height 32 --no-color
 ```
+
+Supported color modes are `none`, `auto`, `ansi16`, `ansi256`, and `truecolor`. Supported character sets are `standard`, `dense`, `minimal`, and `binary`; use `--chars` for a custom darkest-to-lightest ramp.
 
 ---
 
@@ -130,9 +122,10 @@ amoji popular [-n limit]    # default 10
 **Show sticker content** (and mark as used):
 ```bash
 amoji show <name|id>
+amoji show <name|id> --ascii --width 80 --color-mode auto
 ```
 
-For ASCII stickers this prints the art to stdout. For image stickers it prints the absolute file path.
+For ASCII stickers this prints the stored art to stdout. For image stickers it prints the absolute file path unless `--ascii` is used.
 
 **Show metadata only** (does not increment usage count):
 ```bash
@@ -143,6 +136,7 @@ amoji info <name|id>
 ```bash
 amoji use <name|id>            # file path + metadata
 amoji use <name|id> --base64   # also returns base64 data URI (images only)
+amoji use <name|id> --ascii --charset dense --color-mode ansi16
 ```
 
 Outputs structured `key:value` lines:
@@ -152,7 +146,7 @@ Outputs structured `key:value` lines:
 - `name:<name>` — always present
 - `count:<n>` — usage count after marking
 - `base64:<data-uri>` — only with `--base64` on image stickers
-- `───` separator followed by raw ASCII art (ASCII only)
+- `───` separator followed by raw ASCII art (ASCII stickers, or image stickers with `--ascii`)
 
 ---
 
@@ -207,3 +201,4 @@ amoji delete 7
 - FTS (full-text search) is used for `search`. If it returns nothing, a `LIKE` fallback runs automatically.
 - `show` and `use` both increment the usage counter; `info` does not.
 - `use --base64` encodes the image file on the fly and outputs a data URI — convenient for embedding in HTML/markdown without a separate file server.
+- `--color-mode auto` emits ANSI color only when stdout looks like a capable terminal; non-TTY and `NO_COLOR` environments fall back to plain ASCII.
